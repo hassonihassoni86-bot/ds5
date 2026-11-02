@@ -29,12 +29,8 @@ make -C "$SDK" OO_PS4_TOOLCHAIN="$TC" || exit 1
 make -k dirs bin/ds5_controller.elf OO_PS4_TOOLCHAIN="$TC" GOLDHEN_SDK="$SDK" 2>&1 | tee /workspace/build.log
 [ -f bin/ds5_controller.elf ] || { echo "=== ELF NOT BUILT ==="; grep -c "error:" /workspace/build.log; exit 1; }
 
-# --- 6. ELF -> PRX (tool name depends on the toolchain version)
-if [ -x "$TC/bin/linux/create-fself" ]; then
-  "$TC/bin/linux/create-fself" -in=bin/ds5_controller.elf -out=bin/ds5_controller.oelf --lib=bin/ds5_controller.prx --paid 0x3800000000000011
-else
-  "$TC/bin/linux/create-lib" -h 2>&1 | head -30
-  "$TC/bin/linux/create-lib" -in=bin/ds5_controller.elf -out=bin/ds5_controller.oelf --lib=bin/ds5_controller.prx --paid 0x3800000000000011 || \
-  "$TC/bin/linux/create-lib" -in=bin/ds5_controller.elf -out=bin/ds5_controller.prx --paid 0x3800000000000011
-fi
+# --- 6. The ELF is the result of this stage. Turning it into a PRX is done by
+#        ci/make_prx.sh on the runner (the create-lib tool in this image can not do it).
 ls -la bin
+test -s bin/ds5_controller.elf || exit 1
+exit 0
