@@ -10,11 +10,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build with the OpenOrbis toolchain image
+      - name: Build the plugin ELF (OpenOrbis toolchain image)
         run: |
           docker run --rm --user root -w /workspace -v "$PWD":/workspace \
             openorbisofficial/toolchain:latest \
             bash /workspace/ci/build.sh
+
+      - name: Create the PRX
+        run: bash ci/make_prx.sh
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -23,7 +26,6 @@ jobs:
           if-no-files-found: warn
           path: |
             bin/*.prx
-            bin/*.oelf
             bin/*.elf
             ds5_controller.ini.example
             plugins.ini.example
