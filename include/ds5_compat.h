@@ -68,4 +68,21 @@ typedef struct {
     uint8_t r, g, b, a;
 } Ds5PadColor;
 
+/*
+ * Constants that older toolchain releases do not define (same values as the
+ * newer headers; guarded so they never clash).
+ */
+#ifndef ORBIS_USER_SERVICE_MAX_LOGIN_USERS
+#define ORBIS_USER_SERVICE_MAX_LOGIN_USERS      4
+#endif
+#ifndef ORBIS_USER_SERVICE_USER_ID_INVALID
+#define ORBIS_USER_SERVICE_USER_ID_INVALID      -1
+#endif
+#ifndef ORBIS_PAD_CONNECTION_TYPE_STANDARD
+#define ORBIS_PAD_CONNECTION_TYPE_STANDARD      0
+#endif
+#ifndef ORBIS_PAD_DEVICE_CLASS_PAD
+#define ORBIS_PAD_DEVICE_CLASS_PAD              0
+#endif
+
 #endif // DS5_COMPAT_H
