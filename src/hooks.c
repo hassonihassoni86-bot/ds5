@@ -33,7 +33,6 @@
 
 #include <orbis/libkernel.h>
 #include <orbis/Pad.h>
-#include <orbis/Usbd.h>
 #include <orbis/UserService.h>
 #include <orbis/_types/user.h>
 
@@ -193,12 +192,12 @@ typedef int32_t (*scePadRead_t)(int32_t, OrbisPadData*, int32_t);
 typedef int32_t (*scePadReadState_t)(int32_t, OrbisPadData*);
 typedef int32_t (*scePadOpen_t)(int32_t, int32_t, int32_t, void*);
 typedef int32_t (*scePadClose_t)(int32_t);
-typedef int32_t (*scePadGetControllerInformation_t)(int32_t, OrbisPadInformation*);
+typedef int32_t (*scePadGetControllerInformation_t)(int32_t, Ds5PadInformation*);
 typedef int32_t (*scePadGetHandle_t)(int32_t, uint32_t, uint32_t);
-typedef int32_t (*scePadSetLightBar_t)(int32_t, OrbisPadColor*);
+typedef int32_t (*scePadSetLightBar_t)(int32_t, Ds5PadColor*);
 typedef int32_t (*scePadResetLightBar_t)(int32_t);
 typedef int32_t (*scePadSetMotionSensorState_t)(int32_t, int32_t);
-typedef int32_t (*scePadSetVibration_t)(int32_t, const OrbisPadVibeParam*);
+typedef int32_t (*scePadSetVibration_t)(int32_t, const Ds5PadVibeParam*);
 
 static scePadReadExt_t                  p_scePadReadExt = NULL;
 static scePadReadStateExt_t             p_scePadReadStateExt = NULL;
@@ -774,8 +773,8 @@ static int scan_and_open(void) {
             g_shared.pad.leftStick.y = 128;
             g_shared.pad.rightStick.x = 128;
             g_shared.pad.rightStick.y = 128;
-            g_shared.pad.quat.w = 1.0f;
-            g_shared.pad.acell.z = 1.0f;
+            ds5_motion(&g_shared.pad)->quat[3] = 1.0f;
+            ds5_motion(&g_shared.pad)->accel[2] = 1.0f;
         }
         xbox_spin_unlock();
 
@@ -1410,10 +1409,10 @@ int32_t scePadClose_hook(int32_t handle) {
 // Controller Info & Virtual Handle Stubs (Passo 6, F-020)
 // ============================================
 
-int32_t scePadGetControllerInformation_hook(int32_t handle, OrbisPadInformation* info) {
+int32_t scePadGetControllerInformation_hook(int32_t handle, Ds5PadInformation* info) {
     if (handle == XBOX_VIRTUAL_PAD_HANDLE) {
         if (info != NULL) {
-            memset(info, 0, sizeof(OrbisPadInformation));
+            memset(info, 0, sizeof(Ds5PadInformation));
             info->connected = g_shared.connected ? 1 : 0;
             info->connectionType = ORBIS_PAD_CONNECTION_TYPE_STANDARD;
             info->deviceClass = ORBIS_PAD_DEVICE_CLASS_PAD;
@@ -1465,7 +1464,7 @@ int32_t scePadGetHandle_hook(int32_t userID, uint32_t controller_type, uint32_t 
     return HOOK_CONTINUE(scePadGetHandle, scePadGetHandle_t, userID, controller_type, controller_index);
 }
 
-int32_t scePadSetLightBar_hook(int32_t handle, OrbisPadColor *inputColor) {
+int32_t scePadSetLightBar_hook(int32_t handle, Ds5PadColor *inputColor) {
     if (handle == XBOX_VIRTUAL_PAD_HANDLE) {
         return 0;
     }
@@ -1486,7 +1485,7 @@ int32_t scePadSetMotionSensorState_hook(int32_t handle, int32_t enable) {
     return HOOK_CONTINUE(scePadSetMotionSensorState, scePadSetMotionSensorState_t, handle, enable);
 }
 
-int32_t scePadSetVibration_hook(int32_t handle, const OrbisPadVibeParam *param) {
+int32_t scePadSetVibration_hook(int32_t handle, const Ds5PadVibeParam *param) {
     if (param != NULL && g_shared.connected && g_config.enable_rumble) {
         xbox_spin_lock();
         if (g_shared.rumble_large != param->lgMotor || g_shared.rumble_small != param->smMotor) {
@@ -1558,8 +1557,8 @@ int32_t scePadRead_hook(int32_t handle, OrbisPadData* pData, int32_t num) {
                 pData[i].leftStick.y = 128;
                 pData[i].rightStick.x = 128;
                 pData[i].rightStick.y = 128;
-                pData[i].quat.w = 1.0f;
-                pData[i].acell.z = 1.0f;
+                ds5_motion(&pData[i])->quat[3] = 1.0f;
+                ds5_motion(&pData[i])->accel[2] = 1.0f;
             }
         }
         return num;
@@ -1687,8 +1686,8 @@ int32_t scePadReadState_hook(int32_t handle, OrbisPadData* pData) {
             pData->leftStick.y = 128;
             pData->rightStick.x = 128;
             pData->rightStick.y = 128;
-            pData->quat.w = 1.0f;
-            pData->acell.z = 1.0f;
+            ds5_motion(pData)->quat[3] = 1.0f;
+            ds5_motion(pData)->accel[2] = 1.0f;
         }
         return 0;
     }

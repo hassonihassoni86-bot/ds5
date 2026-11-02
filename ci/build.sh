@@ -19,10 +19,8 @@ for h in Pad.h Usbd.h UserService.h libkernel.h; do
   [ -f "$TC/include/orbis/$h" ] && echo "have orbis/$h" || echo "MISSING orbis/$h"
 done
 
-# --- 3. Header compatibility: toolchains name the pad fields differently
-if ! grep -q "quat" "$TC/include/orbis/_types/pad.h"; then
-  sed -i 's/\bquat\b/orientation/g; s/\bacell\b/acceleration/g; s/->vel\./->angularVelocity./g' src/*.c
-fi
+# --- 3. Show every compile error (default limit is 20 per file)
+sed -i "s/^CFLAGS += -Wall/CFLAGS += -Wall -ferror-limit=0/" Makefile
 
 # --- 4. GoldHEN SDK static library
 make -C "$SDK" OO_PS4_TOOLCHAIN="$TC" || exit 1

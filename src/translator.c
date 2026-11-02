@@ -202,21 +202,21 @@ void translator_convert(const Xbox360Report* xbox, OrbisPadData* ds4, const Tran
     }
 
     // Motion data - set to neutral
-    ds4->quat.x = 0.0f;
-    ds4->quat.y = 0.0f;
-    ds4->quat.z = 0.0f;
-    ds4->quat.w = 1.0f;
+    ds5_motion(ds4)->quat[0] = 0.0f;
+    ds5_motion(ds4)->quat[1] = 0.0f;
+    ds5_motion(ds4)->quat[2] = 0.0f;
+    ds5_motion(ds4)->quat[3] = 1.0f;
 
-    ds4->vel.x = 0.0f;
-    ds4->vel.y = 0.0f;
-    ds4->vel.z = 0.0f;
+    ds5_motion(ds4)->gyro[0] = 0.0f;
+    ds5_motion(ds4)->gyro[1] = 0.0f;
+    ds5_motion(ds4)->gyro[2] = 0.0f;
 
-    ds4->acell.x = 0.0f;
-    ds4->acell.y = 0.0f;
-    ds4->acell.z = 1.0f;  // 1g downward
+    ds5_motion(ds4)->accel[0] = 0.0f;
+    ds5_motion(ds4)->accel[1] = 0.0f;
+    ds5_motion(ds4)->accel[2] = 1.0f;  // 1g downward
 
     // Touchpad - no touches
-    ds4->touch.fingers = 0;
+    ds5_touch(ds4)->fingers = 0;
 }
 
 /*
@@ -360,21 +360,21 @@ void translator_convert_xboxone(const XboxOneReport* xbox, OrbisPadData* ds4, co
     }
 
     // Motion data - set to neutral
-    ds4->quat.x = 0.0f;
-    ds4->quat.y = 0.0f;
-    ds4->quat.z = 0.0f;
-    ds4->quat.w = 1.0f;
+    ds5_motion(ds4)->quat[0] = 0.0f;
+    ds5_motion(ds4)->quat[1] = 0.0f;
+    ds5_motion(ds4)->quat[2] = 0.0f;
+    ds5_motion(ds4)->quat[3] = 1.0f;
 
-    ds4->vel.x = 0.0f;
-    ds4->vel.y = 0.0f;
-    ds4->vel.z = 0.0f;
+    ds5_motion(ds4)->gyro[0] = 0.0f;
+    ds5_motion(ds4)->gyro[1] = 0.0f;
+    ds5_motion(ds4)->gyro[2] = 0.0f;
 
-    ds4->acell.x = 0.0f;
-    ds4->acell.y = 0.0f;
-    ds4->acell.z = 1.0f;  // 1g downward
+    ds5_motion(ds4)->accel[0] = 0.0f;
+    ds5_motion(ds4)->accel[1] = 0.0f;
+    ds5_motion(ds4)->accel[2] = 1.0f;  // 1g downward
 
     // Touchpad - no touches
-    ds4->touch.fingers = 0;
+    ds5_touch(ds4)->fingers = 0;
 }
 
 /*
@@ -543,21 +543,21 @@ void translator_convert_switch(const SwitchInputOnlyReport* sw, OrbisPadData* ds
     }
 
     // Motion data - set to neutral
-    ds4->quat.x = 0.0f;
-    ds4->quat.y = 0.0f;
-    ds4->quat.z = 0.0f;
-    ds4->quat.w = 1.0f;
+    ds5_motion(ds4)->quat[0] = 0.0f;
+    ds5_motion(ds4)->quat[1] = 0.0f;
+    ds5_motion(ds4)->quat[2] = 0.0f;
+    ds5_motion(ds4)->quat[3] = 1.0f;
 
-    ds4->vel.x = 0.0f;
-    ds4->vel.y = 0.0f;
-    ds4->vel.z = 0.0f;
+    ds5_motion(ds4)->gyro[0] = 0.0f;
+    ds5_motion(ds4)->gyro[1] = 0.0f;
+    ds5_motion(ds4)->gyro[2] = 0.0f;
 
-    ds4->acell.x = 0.0f;
-    ds4->acell.y = 0.0f;
-    ds4->acell.z = 1.0f;  // 1g downward
+    ds5_motion(ds4)->accel[0] = 0.0f;
+    ds5_motion(ds4)->accel[1] = 0.0f;
+    ds5_motion(ds4)->accel[2] = 1.0f;  // 1g downward
 
     // Touchpad - no touches
-    ds4->touch.fingers = 0;
+    ds5_touch(ds4)->fingers = 0;
 }
 
 /*
@@ -701,36 +701,36 @@ void translator_convert_dualsense(const DualSenseReport* ds, OrbisPadData* ds4, 
     // MOTION (neutral unless explicitly enabled at build time)
     // ========================================
 
-    ds4->quat.x = 0.0f;
-    ds4->quat.y = 0.0f;
-    ds4->quat.z = 0.0f;
-    ds4->quat.w = 1.0f;
+    ds5_motion(ds4)->quat[0] = 0.0f;
+    ds5_motion(ds4)->quat[1] = 0.0f;
+    ds5_motion(ds4)->quat[2] = 0.0f;
+    ds5_motion(ds4)->quat[3] = 1.0f;
 
 #if DUALSENSE_PASS_MOTION
     if (ds->len >= DS5_OFF_ACCEL + 6) {
         const float deg2rad = 0.01745329252f;
-        ds4->vel.x = (float)ds5_s16(&r[DS5_OFF_GYRO + 0]) / DS5_GYRO_PER_DEG_S * deg2rad;
-        ds4->vel.y = (float)ds5_s16(&r[DS5_OFF_GYRO + 2]) / DS5_GYRO_PER_DEG_S * deg2rad;
-        ds4->vel.z = (float)ds5_s16(&r[DS5_OFF_GYRO + 4]) / DS5_GYRO_PER_DEG_S * deg2rad;
-        ds4->acell.x = (float)ds5_s16(&r[DS5_OFF_ACCEL + 0]) / DS5_ACCEL_PER_G;
-        ds4->acell.y = (float)ds5_s16(&r[DS5_OFF_ACCEL + 2]) / DS5_ACCEL_PER_G;
-        ds4->acell.z = (float)ds5_s16(&r[DS5_OFF_ACCEL + 4]) / DS5_ACCEL_PER_G;
+        ds5_motion(ds4)->gyro[0] = (float)ds5_s16(&r[DS5_OFF_GYRO + 0]) / DS5_GYRO_PER_DEG_S * deg2rad;
+        ds5_motion(ds4)->gyro[1] = (float)ds5_s16(&r[DS5_OFF_GYRO + 2]) / DS5_GYRO_PER_DEG_S * deg2rad;
+        ds5_motion(ds4)->gyro[2] = (float)ds5_s16(&r[DS5_OFF_GYRO + 4]) / DS5_GYRO_PER_DEG_S * deg2rad;
+        ds5_motion(ds4)->accel[0] = (float)ds5_s16(&r[DS5_OFF_ACCEL + 0]) / DS5_ACCEL_PER_G;
+        ds5_motion(ds4)->accel[1] = (float)ds5_s16(&r[DS5_OFF_ACCEL + 2]) / DS5_ACCEL_PER_G;
+        ds5_motion(ds4)->accel[2] = (float)ds5_s16(&r[DS5_OFF_ACCEL + 4]) / DS5_ACCEL_PER_G;
     } else
 #endif
     {
-        ds4->vel.x = 0.0f;
-        ds4->vel.y = 0.0f;
-        ds4->vel.z = 0.0f;
-        ds4->acell.x = 0.0f;
-        ds4->acell.y = 0.0f;
-        ds4->acell.z = 1.0f;  // 1g downward
+        ds5_motion(ds4)->gyro[0] = 0.0f;
+        ds5_motion(ds4)->gyro[1] = 0.0f;
+        ds5_motion(ds4)->gyro[2] = 0.0f;
+        ds5_motion(ds4)->accel[0] = 0.0f;
+        ds5_motion(ds4)->accel[1] = 0.0f;
+        ds5_motion(ds4)->accel[2] = 1.0f;  // 1g downward
     }
 
     // ========================================
     // TOUCHPAD (up to two fingers)
     // ========================================
 
-    ds4->touch.fingers = 0;
+    ds5_touch(ds4)->fingers = 0;
     if (ds->len >= DS5_MIN_TOUCH_LEN) {
         static const uint8_t offs[2] = { DS5_OFF_TOUCH0, DS5_OFF_TOUCH1 };
         uint8_t n = 0;
@@ -746,12 +746,12 @@ void translator_convert_dualsense(const DualSenseReport* ds, OrbisPadData* ds4, 
             // DS4 touchpad is shorter (942 rows) than the DualSense one (1080)
             y = (y * DS4_TOUCH_MAX_Y) / DS5_TOUCH_MAX_Y;
 
-            ds4->touch.touch[n].x = (uint16_t)x;
-            ds4->touch.touch[n].y = (uint16_t)y;
-            ds4->touch.touch[n].finger = (uint8_t)(t[0] & 0x7F);
+            ds5_touch(ds4)->touch[n].x = (uint16_t)x;
+            ds5_touch(ds4)->touch[n].y = (uint16_t)y;
+            ds5_touch(ds4)->touch[n].finger = (uint8_t)(t[0] & 0x7F);
             n++;
         }
-        ds4->touch.fingers = n;
+        ds5_touch(ds4)->fingers = n;
     }
 }
 

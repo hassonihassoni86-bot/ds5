@@ -11,6 +11,7 @@
 #include "switch_controller.h"
 #include "dualsense.h"
 #include "ds4.h"
+#include "ds5_compat.h"
 #include "config.h"
 
 /*
