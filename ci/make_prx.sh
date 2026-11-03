@@ -17,6 +17,8 @@ if [ -z "$FS" ]; then
   exit 1
 fi
 chmod +x "$FS"
+export OO_PS4_TOOLCHAIN=$(echo "$FS" | sed 's#/bin/linux/create-fself$##')
+echo "OO_PS4_TOOLCHAIN=$OO_PS4_TOOLCHAIN"
 echo "Using: $FS"
 "$FS" -h 2>&1 | head -20 || true
 
